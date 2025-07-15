@@ -1,0 +1,29 @@
+<%- include('partials/header') %>
+<%- include('partials/navigation') %>
+
+<main class="container">
+    <div class="p-4 p-md-5 mb-4 rounded text-body-emphasis bg-light">
+        <div class="col-lg-8 px-0">
+            <h1 class="display-4 fst-italic">Bienvenue sur Demo Store</h1>
+            <p class="lead my-3">Explorez notre collection d'articles exclusifs. Ce site est une démonstration conçue pour l'apprentissage des vulnérabilités web.</p>
+        </div>
+    </div>
+
+    <h2 class="pb-2 border-bottom">Nos Produits</h2>
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+        <% products.forEach(product => { %>
+            <div class="col">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title"><%= product.name %></h5>
+                        <p class="card-text flex-grow-1"><%= product.description %></p>
+                        <a href="/products/<%= product.id %>" class="btn btn-sm btn-outline-secondary align-self-start">Voir les détails</a>
+                    </div>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+</main>
+
+<%- include('partials/footer') %>

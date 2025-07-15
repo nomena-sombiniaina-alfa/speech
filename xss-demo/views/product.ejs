@@ -1,0 +1,43 @@
+<%- include('partials/header') %>
+<%- include('partials/navigation') %>
+
+<main class="container">
+    <div class="bg-light p-5 rounded">
+        <h1><%= product.name %></h1>
+        <p class="lead"><%= product.description %></p>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-8 offset-md-2">
+            <h3><i class="bi bi-chat-dots-fill"></i> Section des commentaires</h3>
+            <hr>
+
+            <!-- Affichage des commentaires -->
+            <% if (comments && comments.length > 0) { %>
+                <% comments.forEach(comment => { %>
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <p class="card-text"><%- comment.text %></p>
+                            <footer class="blockquote-footer">Posté par <cite title="Source Title"><%= comment.User.username %></cite></footer>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p>Aucun commentaire pour le moment. Soyez le premier à réagir !</p>
+            <% } %>
+
+            <!-- Formulaire de nouveau commentaire -->
+            <div class="mt-5">
+                <h4>Ajouter votre commentaire</h4>
+                <form action="/products/<%= product.id %>/comments" method="post">
+                    <div class="mb-3">
+                        <textarea class="form-control" id="text" name="text" rows="4" required placeholder="Écrivez votre commentaire ici... La vulnérabilité XSS est toujours présente !"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Envoyer le commentaire</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<%- include('partials/footer') %>
