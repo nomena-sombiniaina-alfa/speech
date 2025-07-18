@@ -1,0 +1,39 @@
+2025-07-18 18:10:34,493 - INFO - --- Starting Spidering Phase ---
+2025-07-18 18:10:34,493 - INFO - Crawling page: http://localhost:3000/#/
+2025-07-18 18:10:34,499 - INFO - New endpoint discovered: GET /
+2025-07-18 18:10:34,891 - INFO - New endpoint discovered: GET /assets/i18n/en.json
+2025-07-18 18:10:34,892 - INFO - New endpoint discovered: GET /socket.io/?EIO={...}&t={...}&transport={...}
+2025-07-18 18:10:34,892 - INFO - New endpoint discovered: GET /rest/admin/application-version
+2025-07-18 18:10:34,892 - INFO - New endpoint discovered: GET /rest/admin/application-configuration
+2025-07-18 18:10:34,892 - INFO - New endpoint discovered: GET /api/Challenges/?name={...}
+2025-07-18 18:10:34,893 - INFO - New endpoint discovered: GET /rest/languages
+2025-07-18 18:10:34,893 - INFO - New endpoint discovered: GET /api/Quantitys/
+2025-07-18 18:10:34,893 - INFO - New endpoint discovered: GET /rest/products/search
+2025-07-18 18:10:34,920 - INFO - New endpoint discovered: GET /socket.io/?EIO={...}&sid={...}&t={...}&transport={...}
+2025-07-18 18:10:37,576 - INFO - Checking for overlays...
+2025-07-18 18:10:37,616 - INFO - Found a visible overlay: [role="dialog"]. Searching for a close button.
+2025-07-18 18:10:37,628 - WARNING - Could not close overlay '[role="dialog"]'. It may interfere with the crawl.
+2025-07-18 18:10:37,648 - INFO - Found new URL to visit: http://localhost:3000/redirect?to=https://github.com/juice-shop/juice-shop
+2025-07-18 18:10:37,649 - INFO - Found 27 clickable elements on http://localhost:3000/#/ to interact with.
+2025-07-18 18:10:37,653 - ERROR - A general error occurred on page http://localhost:3000/#/: 'Locator' object has no attribute 'tag_name'. Moving to next URL.
+2025-07-18 18:10:37,653 - INFO - Crawling page: http://localhost:3000/redirect?to=https://github.com/juice-shop/juice-shop
+2025-07-18 18:10:37,655 - INFO - New endpoint discovered: GET /redirect?to={...}
+2025-07-18 18:10:43,599 - INFO - Checking for overlays...
+2025-07-18 18:10:43,637 - INFO - Found a visible overlay: [role="dialog"]. Searching for a close button.
+2025-07-18 18:10:43,655 - WARNING - Could not close overlay '[role="dialog"]'. It may interfere with the crawl.
+2025-07-18 18:10:43,659 - INFO - Found a visible overlay: [aria-modal="true"]. Searching for a close button.
+2025-07-18 18:10:43,668 - WARNING - Could not close overlay '[aria-modal="true"]'. It may interfere with the crawl.
+2025-07-18 18:10:44,005 - INFO - Found new URL to visit: http://localhost:3000
+2025-07-18 18:10:44,170 - INFO - Found 423 clickable elements on https://github.com/juice-shop/juice-shop to interact with.
+2025-07-18 18:10:44,177 - ERROR - A general error occurred on page http://localhost:3000/redirect?to=https://github.com/juice-shop/juice-shop: 'Locator' object has no attribute 'tag_name'. Moving to next URL.
+2025-07-18 18:10:44,177 - INFO - Crawling page: http://localhost:3000
+2025-07-18 18:10:47,016 - INFO - Checking for overlays...
+2025-07-18 18:10:47,045 - INFO - Found a visible overlay: [role="dialog"]. Searching for a close button.
+2025-07-18 18:10:47,054 - WARNING - Could not close overlay '[role="dialog"]'. It may interfere with the crawl.
+2025-07-18 18:10:47,071 - INFO - Found 27 clickable elements on http://localhost:3000/#/ to interact with.
+2025-07-18 18:10:47,074 - ERROR - A general error occurred on page http://localhost:3000: 'Locator' object has no attribute 'tag_name'. Moving to next URL.
+2025-07-18 18:10:47,074 - INFO - Crawl finished. Shutting down browser.
+2025-07-18 18:10:47,099 - INFO - 
+--- Starting Analysis Phase: Testing 0 requests ---
+
+2025-07-18 18:10:47,099 - INFO - --- Scan complete ---

@@ -1,0 +1,53 @@
+Crée un script Python utilisant `selenium-wire` (ou autre lib si pertinent) qui fait ceci :
+
+### 🔧 Paramètres (doivent être facilement configurables) :
+- `scope = ['chatgpt.com', '*.openai.com']`
+- `initial_urls = ['https://chatgpt.com', 'https://profile.openai.com']`
+- `cookies = { 'csrf_token': 'xxx', 'token': 'xxx' }`
+- `headers = { 'Authorization': 'Bearer xxx', 'User-Agent': 'Custom UA' }`
+- `keys = ['my-uuid', 10, 'user-10']`  # str ou int, match exact
+- `excluded = ['admin.openai.com']`
+- `graphql_path = ['/graphql', '/api/graphql']`
+
+### 🎯 Objectif :
+1. Lancer un navigateur (headless ou non) pour visiter chaque `initial_url`.
+2. Intercepter TOUTES les requêtes sortantes générées par le navigateur.
+3. Pour chaque requête interceptée :
+   - ✅ Ne la considérer que si :
+     - Elle part vers un domaine inclus dans `scope`
+     - Elle **n'est pas dans un domaine de `excluded`**
+     - Ce n'est **pas une requête vers un asset** (`.jpg`, `.png`, `.ico`, `.woff`, `.js`, `.css`, etc)
+     - C’est une requête `GET`, **ou** une `POST` vers un `graphql_path` qui est un query. On ignore si c'est un mutation ou un subscription
+     - **Une des `keys` est trouvée telle quelle dans l’URL** (exact match dans un segment de chemin ou paramètre GET), **ou dans le body de la query POST** (exact match d'une string ou valeur)
+
+4. Si les conditions sont remplies :
+   - Rejouer la requête, **mais sans le header Authorization**, et **sans les cookies** (en les supprimant tous).
+   - Comparer la réponse HTTP (status code + taille + texte brut optionnellement)
+   - Si il n'y a pas trop de difference ou si il n'y a pas des mots du type 'unauthorized' ou 'forbidden' ou autre mots suggerant que la requette a échoué, on enregistre la requette dans un fichier de log dans `idor_logs` tel que la requette initial se trouve en haut, suivi de 5 saut de ligne suivi d'une ligne de `=` suivi de 5 autre ligne de saut de ligne, suivi de la réponse
+
+5. Important : le script ne doit **pas bloquer les requêtes** dans le navigateur original. C’est uniquement passif + replay.
+6. Bonus : logguer aussi les tentatives ignorées (raison du rejet) pour debug.
+
+### 🧪 Exemples :
+- Requête vers `https://chatgpt.com/c/my-uuid` ✅ (GET + clé exacte trouvée dans l’URL)
+- Requête vers `https://chatgpt.com/c/my-uuid-12` ❌ (clé partielle, pas exacte)
+- Requête vers `https://admin.openai.com/profile` ❌ (excluded)
+- Requête vers `https://chatgpt.com/image.png` ❌ (asset)
+- Requête POST vers `/api/graphql` contenant `{ userId: "user-10" }` ✅ (clé présente dans payload JSON, dans un champ)
+- Requête POST vers `/api/graphql` contenant `mutation {change_user(userId: "user-10")}` est ignorer car c'est une mutation
+
+### 📦 Output :
+- Un fichier `.txt` ou `.json` listant :
+  - L’URL originale
+  - Le code HTTP original vs. replay
+  - La taille de la réponse
+  - La présence ou non de l’objet dans le contenu (si possible)
+
+### 🧠 Astuce d’optimisation :
+- Utilise une regex simple pour vérifier que les clés sont **contenues telles quelles**, et pas comme substring.
+- Si le body est JSON, transforme-le en dict et cherche les valeurs **exactes**.
+
+---
+
+**Objectif final : détection d’IDOR anonymes, en limitant les faux positifs et le bruit.**
+Le code doit être propre, lisible, commenté, et facilement réutilisable sur d'autres cibles.

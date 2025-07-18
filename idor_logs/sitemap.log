@@ -1,0 +1,11 @@
+GET /
+GET /assets/i18n/en.json
+GET /socket.io/?EIO={...}&t={...}&transport={...}
+GET /rest/admin/application-version
+GET /rest/admin/application-configuration
+GET /api/Challenges/?name={...}
+GET /rest/languages
+GET /api/Quantitys/
+GET /rest/products/search
+GET /socket.io/?EIO={...}&sid={...}&t={...}&transport={...}
+GET /redirect?to={...}
