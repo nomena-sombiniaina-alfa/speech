@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const { Sequelize, DataTypes } = require('sequelize');
+const helmet = require('helmet');
 
 const app = express();
 const port = 3000;
@@ -40,6 +41,17 @@ Comment.belongsTo(Product);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Configuration de la Content Security Policy (CSP)
+app.use(helmet.contentSecurityPolicy({
+    directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "https://cdn.jsdelivr.net"], // Autoriser les scripts de Bootstrap
+        styleSrc: ["'self'", "https://cdn.jsdelivr.net"],
+        fontSrc: ["'self'", "https://cdn.jsdelivr.net"],
+        imgSrc: ["'self'", "data:"]
+    }
+}));
 
 // Middleware pour exposer le statut de connexion et l'utilisateur à toutes les vues
 app.use(async (req, res, next) => {
@@ -92,7 +104,10 @@ app.post('/login', async (req, res) => {
             // Toutes les données de l'utilisateur, y compris le mot de passe, sont encodées en Base64 et stockées.
             // Cela expose des informations sensibles qui peuvent être facilement décodées.
             const userData = Buffer.from(JSON.stringify(user.get({ plain: true }))).toString('base64');
-            res.cookie('userData', userData, { httpOnly: false }); // Cookie non sécurisé pour la démo
+            res.cookie('userData', userData, { 
+                httpOnly: true, // Empêche l'accès au cookie via JavaScript
+                sameSite: 'strict' // Prévient les attaques CSRF
+            });
             res.redirect('/products');
         } else {
             res.status(401).send('Identifiants incorrects');

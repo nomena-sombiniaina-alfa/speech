@@ -17,7 +17,7 @@
                 <% comments.forEach(comment => { %>
                     <div class="card mb-3">
                         <div class="card-body">
-                            <p class="card-text"><%- comment.text %></p>
+                            <p class="card-text"><%= comment.text %></p>
                             <footer class="blockquote-footer">Posté par <cite title="Source Title"><%= comment.User.username %></cite></footer>
                         </div>
                     </div>
