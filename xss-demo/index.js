@@ -80,22 +80,18 @@ app.get('/login', (req, res) => {
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
-    // VULNÉRABILITÉ: Injection SQL
-    // La requête est construite en concaténant directement les entrées utilisateur,
-    // ce qui la rend vulnérable aux injections SQL.
-    // Un attaquant peut entrer: ' OR 1=1 --
-    // comme nom d'utilisateur pour contourner l'authentification.
-    const query = `SELECT * FROM "Users" WHERE username = '${username}' AND password = '${password}'`;
     try {
-        const [results] = await sequelize.query(query);
-        const user = results[0];
+        // CORRECTION: Utilisation de requêtes paramétrées pour prévenir les injections SQL.
+        // Sequelize assainit les entrées, ce qui empêche les attaquants de manipuler la requête.
+        const user = await User.findOne({ where: { username, password } });
+        
         console.log('user:', user);
 
         if (user) {
             // VULNÉRABILITÉ: Stockage des données utilisateur sensibles dans un cookie
             // Toutes les données de l'utilisateur, y compris le mot de passe, sont encodées en Base64 et stockées.
             // Cela expose des informations sensibles qui peuvent être facilement décodées.
-            const userData = Buffer.from(JSON.stringify(user)).toString('base64');
+            const userData = Buffer.from(JSON.stringify(user.get({ plain: true }))).toString('base64');
             res.cookie('userData', userData, { httpOnly: false }); // Cookie non sécurisé pour la démo
             res.redirect('/products');
         } else {
