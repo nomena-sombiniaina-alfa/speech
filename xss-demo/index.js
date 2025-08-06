@@ -41,9 +41,20 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Middleware pour exposer le statut de connexion à toutes les vues
-app.use((req, res, next) => {
-    res.locals.isLoggedIn = !!req.cookies.sessionId;
+// Middleware pour exposer le statut de connexion et l'utilisateur à toutes les vues
+app.use(async (req, res, next) => {
+    res.locals.isLoggedIn = !!req.cookies.userData;
+    res.locals.user = null;
+    if (res.locals.isLoggedIn) {
+        try {
+            const userData = Buffer.from(req.cookies.userData, 'base64').toString('utf8');
+            res.locals.user = JSON.parse(userData);
+        } catch (error) {
+            console.error("Erreur lors du décodage des données utilisateur:", error);
+            res.clearCookie('userData'); // Efface le cookie corrompu
+            res.locals.isLoggedIn = false;
+        }
+    }
     next();
 });
 
@@ -52,7 +63,7 @@ app.set('views', path.join(__dirname, 'views'));
 
 // Middleware d'authentification
 const isAuthenticated = (req, res, next) => {
-    if (req.cookies.sessionId) return next();
+    if (req.cookies.userData) return next();
     res.redirect('/login');
 };
 
@@ -68,17 +79,36 @@ app.get('/login', (req, res) => {
 
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-    const user = await User.findOne({ where: { username, password } });
-    if (user) {
-        res.cookie('sessionId', `${user.id}-${Date.now()}`, { httpOnly: false }); // Cookie non sécurisé pour la démo
-        res.redirect('/products');
-    } else {
-        res.status(401).send('Identifiants incorrects');
+
+    // VULNÉRABILITÉ: Injection SQL
+    // La requête est construite en concaténant directement les entrées utilisateur,
+    // ce qui la rend vulnérable aux injections SQL.
+    // Un attaquant peut entrer: ' OR 1=1 --
+    // comme nom d'utilisateur pour contourner l'authentification.
+    const query = `SELECT * FROM "Users" WHERE username = '${username}' AND password = '${password}'`;
+    try {
+        const [results] = await sequelize.query(query);
+        const user = results[0];
+        console.log('user:', user);
+
+        if (user) {
+            // VULNÉRABILITÉ: Stockage des données utilisateur sensibles dans un cookie
+            // Toutes les données de l'utilisateur, y compris le mot de passe, sont encodées en Base64 et stockées.
+            // Cela expose des informations sensibles qui peuvent être facilement décodées.
+            const userData = Buffer.from(JSON.stringify(user)).toString('base64');
+            res.cookie('userData', userData, { httpOnly: false }); // Cookie non sécurisé pour la démo
+            res.redirect('/products');
+        } else {
+            res.status(401).send('Identifiants incorrects');
+        }
+    } catch (error) {
+        console.error("Erreur de connexion:", error);
+        res.status(500).send("Une erreur est survenue lors de la tentative de connexion.");
     }
 });
 
 app.post('/logout', (req, res) => {
-    res.clearCookie('sessionId');
+    res.clearCookie('userData');
     res.redirect('/login');
 });
 
@@ -104,8 +134,12 @@ app.get('/products/:id', isAuthenticated, async (req, res) => {
 
 app.post('/products/:id/comments', isAuthenticated, async (req, res) => {
     const { text } = req.body;
-    const sessionId = req.cookies.sessionId;
-    const userId = sessionId.split('-')[0];
+    
+    // Assure que les informations de l'utilisateur sont disponibles
+    if (!res.locals.user) {
+        return res.status(401).send("Session invalide, veuillez vous reconnecter.");
+    }
+    const userId = res.locals.user.id;
 
     try {
         await Comment.create({
@@ -125,6 +159,8 @@ sequelize.sync({ force: true }).then(async () => {
     console.log('Base de données synchronisée.');
     
     await User.create({ username: 'admin', password: 'password' });
+    await User.create({ username: 'user', password: 'password' });
+    await User.create({ username: 'user2', password: 'password' });
     await Product.create({ name: 'Article de luxe', description: 'Un produit très cher.' });
     await Product.create({ name: 'Super Widget', description: 'Un autre article incroyable.' });
     

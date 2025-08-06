@@ -4,7 +4,7 @@
 <main class="container">
     <div class="p-4 p-md-5 mb-4 rounded text-body-emphasis bg-light">
         <div class="col-lg-8 px-0">
-            <h1 class="display-4 fst-italic">Bienvenue sur Demo Store</h1>
+            <h1 class="display-4 fst-italic">Bienvenue sur Demo Store, <%= user ? user.username : 'invité' %> !</h1>
             <p class="lead my-3">Explorez notre collection d'articles exclusifs. Ce site est une démonstration conçue pour l'apprentissage des vulnérabilités web.</p>
         </div>
     </div>

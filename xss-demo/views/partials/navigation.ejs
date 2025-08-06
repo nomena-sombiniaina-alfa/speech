@@ -7,6 +7,11 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <% if (isLoggedIn) { %>
+                    <% if (user) { %>
+                    <li class="nav-item">
+                        <span class="nav-link">Bonjour, <%= user.username %></span>
+                    </li>
+                    <% } %>
                     <li class="nav-item">
                         <a class="nav-link" href="/products">Produits</a>
                     </li>
